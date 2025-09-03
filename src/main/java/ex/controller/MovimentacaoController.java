@@ -2,9 +2,9 @@ package ex.controller;
 
 import ex.model.Movimentacao;
 import ex.model.MovimentacaoDTO;
+import ex.model.TipoMovimentacao;
 import ex.model.Usuario;
 import ex.model.repository.MovimentacaoRepository;
-import ex.model.repository.TipoMovimentacao;
 import ex.model.repository.UsuarioRepository;
 import ex.service.MovimentacaoService;
 
@@ -17,9 +17,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/movimentacoes")
 public class MovimentacaoController {
@@ -53,9 +51,9 @@ public class MovimentacaoController {
         @RequestParam String ano) {
         
         Map<String, BigDecimal> totais = new HashMap<>();
-        totais.put("dizimo", movimentacaoService.calcularTotal(TipoMovimentacao.dizimo, mes, ano));
-        totais.put("oferta", movimentacaoService.calcularTotal(TipoMovimentacao.oferta, mes, ano));
-        totais.put("despesa", movimentacaoService.calcularTotal(TipoMovimentacao.despesa, mes, ano));
+        totais.put("dizimo", movimentacaoService.calcularTotal(TipoMovimentacao.DIZIMO, mes, ano));
+        totais.put("oferta", movimentacaoService.calcularTotal(TipoMovimentacao.OFERTA, mes, ano));
+        totais.put("despesa", movimentacaoService.calcularTotal(TipoMovimentacao.DESPESA, mes, ano));
         
         return ResponseEntity.ok(totais);
     }
@@ -93,7 +91,7 @@ public class MovimentacaoController {
             movimentacao.setDescricao(movimentacaoDTO.getDescricao());
             movimentacao.setValor(movimentacaoDTO.getValor());
             movimentacao.setData(movimentacaoDTO.getData());
-            movimentacao.setTipo(TipoMovimentacao.valueOf(movimentacaoDTO.getTipo()));
+            movimentacao.setTipo(TipoMovimentacao.valueOf(movimentacaoDTO.getTipo().name()));
 
             // Busque o usuário se necessário
             if (movimentacaoDTO.getUsuarioId() != null) {
@@ -126,7 +124,7 @@ public class MovimentacaoController {
             movimentacao.setDescricao(movimentacaoDTO.getDescricao());
             movimentacao.setValor(movimentacaoDTO.getValor());
             movimentacao.setData(movimentacaoDTO.getData());
-            movimentacao.setTipo(TipoMovimentacao.valueOf(movimentacaoDTO.getTipo()));
+            movimentacao.setTipo(TipoMovimentacao.valueOf(movimentacaoDTO.getTipo().name()));
 
             // Vincula usuário se for dízimo
             if (movimentacaoDTO.getTipo().equals("dizimo")) {

@@ -5,30 +5,46 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "usuario")
 public class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_usuarios")
-    private int id;
+    @Column(name = "id_usuario")
+    private Long id;
 
     @Column(nullable = false, length = 100)
     private String nome;
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String usuario;
+    @Column(nullable = false, unique = true, length = 150)
+    private String email;
 
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 100)
     private String senha;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private Perfil perfil;
-    
-    public int getId_usuarios() {
+
+    private Boolean ativo = true;
+
+    @ManyToOne
+    @JoinColumn(name = "id_congregacao", nullable = false)
+    private Congregacao congregacao;
+
+    // Getters e Setters
+    public Long getId() {
         return id;
     }
 
-    public void setId_usuarios(int id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public Congregacao getCongregacao() {
+        return congregacao;
+    }
+
+    public void setCongregacao(Congregacao congregacao) {
+        this.congregacao = congregacao;
     }
 
     public String getNome() {
@@ -39,12 +55,12 @@ public class Usuario {
         this.nome = nome;
     }
 
-    public String getUsuario() {
-        return usuario;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getSenha() {
@@ -62,8 +78,18 @@ public class Usuario {
     public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
     }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
 }
 
+
+
 enum Perfil {
-    admin, user
+    admin, user, super_admin
 }
