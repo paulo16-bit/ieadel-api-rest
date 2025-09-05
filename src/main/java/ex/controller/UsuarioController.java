@@ -1,6 +1,7 @@
 package ex.controller;
 
 import ex.model.Congregacao;
+import ex.model.Perfil;
 import ex.model.Usuario;
 import ex.model.UsuarioDTO;
 import ex.model.repository.UsuarioRepository;
@@ -54,7 +55,7 @@ public class UsuarioController {
             novoUsuario.setNome(usuarioDTO.getNome());
             novoUsuario.setEmail(usuarioDTO.getEmail());
             novoUsuario.setSenha(usuarioDTO.getSenha());
-            novoUsuario.setPerfil(usuarioDTO.getPerfil());
+            novoUsuario.setPerfil(Perfil.user);
 
             Congregacao congregacao = congregacaoRepository.findById(usuarioDTO.getIdCongregacao())
                     .orElseThrow(() -> new IllegalArgumentException("Congregação não encontrada"));

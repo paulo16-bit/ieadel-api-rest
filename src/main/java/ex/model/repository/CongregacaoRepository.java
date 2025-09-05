@@ -7,5 +7,4 @@ import java.util.List;
 
 public interface CongregacaoRepository extends JpaRepository<Congregacao, Long> {
     List<Congregacao> findAll();
-    Congregacao findById(long id);
 }
