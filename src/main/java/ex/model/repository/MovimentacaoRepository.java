@@ -2,6 +2,7 @@ package ex.model.repository;
 
 
 import ex.model.Movimentacao;
+import ex.model.TipoMovimentacao;
 
 import java.math.BigDecimal;
 import java.util.List;

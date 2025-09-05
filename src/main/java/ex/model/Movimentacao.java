@@ -1,78 +1,64 @@
 package ex.model;
 
-import java.time.LocalDate;
-
-import ex.model.repository.TipoMovimentacao;
 import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "movimentacao")
 public class Movimentacao {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id_mov;
+    @Column(name = "id_mov")
+    private Long id;
 
-    @Column(nullable = false, length = 45)
+    @ManyToOne
+    @JoinColumn(name = "id_congregacao", nullable = false)
+    private Congregacao congregacao;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", nullable = false)
+    private Usuario usuario;
+
+    @Column(nullable = false, length = 255)
     private String descricao;
 
     @Column(nullable = false)
-    private double valor;
-    
+    private Double valor;
+
     @Column(nullable = false)
     private LocalDate data;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private TipoMovimentacao tipo;
-    
-    @ManyToOne
-    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuarios", nullable = true)
-    private Usuario usuario;
-    
-    public int getId_mov() {
-        return id_mov;
-    }
 
-    public void setId_mov(int id_mov) {
-        this.id_mov = id_mov;
-    }
+    @Column(name = "data_registro")
+    private LocalDateTime dataRegistro = LocalDateTime.now();
 
-    public String getDescricao() {
-        return descricao;
-    }
+    // Getters e Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
+    public Congregacao getCongregacao() { return congregacao; }
+    public void setCongregacao(Congregacao congregacao) { this.congregacao = congregacao; }
 
-    public double getValor() {
-        return valor;
-    }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 
-    public void setValor(double valor) {
-        this.valor = valor;
-    }
+    public String getDescricao() { return descricao; }
+    public void setDescricao(String descricao) { this.descricao = descricao; }
 
-    public TipoMovimentacao getTipo() {
-        return tipo;
-    }
+    public Double getValor() { return valor; }
+    public void setValor(Double valor) { this.valor = valor; }
 
-    public void setTipo(TipoMovimentacao tipo) {
-        this.tipo = tipo;
-    }
-    public LocalDate getData() {
-        return data;
-    }
+    public LocalDate getData() { return data; }
+    public void setData(LocalDate data) { this.data = data; }
 
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
+    public TipoMovimentacao getTipo() { return tipo; }
+    public void setTipo(TipoMovimentacao tipo) { this.tipo = tipo; }
 
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+    public LocalDateTime getDataRegistro() { return dataRegistro; }
+    public void setDataRegistro(LocalDateTime dataRegistro) { this.dataRegistro = dataRegistro; }
 }

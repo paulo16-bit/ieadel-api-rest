@@ -1,7 +1,11 @@
 package ex.controller;
 
+import ex.model.Congregacao;
+import ex.model.Perfil;
 import ex.model.Usuario;
+import ex.model.UsuarioDTO;
 import ex.model.repository.UsuarioRepository;
+import ex.model.repository.CongregacaoRepository;
 import ex.service.AuthService;
 
 import java.util.List;
@@ -19,10 +23,12 @@ public class UsuarioController {
     private AuthService authService;
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+    @Autowired
+    private CongregacaoRepository congregacaoRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-    	Usuario user = authService.autenticar(request.getUsuario(), request.getSenha());
+    	Usuario user = authService.autenticar(request.getEmail(), request.getSenha());
         
     	if (user != null) {
             return ResponseEntity.ok(user);
@@ -36,29 +42,41 @@ public class UsuarioController {
         return usuarioRepository.findAll();
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> buscarUsuarioPorId(@PathVariable int id) {
+    public ResponseEntity<Usuario> buscarUsuarioPorId(@PathVariable Long id) {
         return usuarioRepository.findById(id)
             .map(usuario -> ResponseEntity.ok(usuario))
             .orElse(ResponseEntity.notFound().build());
     }
-    
+
     @PostMapping("/novo")
-    public ResponseEntity<?> criar(@RequestBody Usuario usuario) {
-    	try {
-    		Usuario salva = authService.adicionar(usuario);
-            return ResponseEntity.ok(salva);
+    public ResponseEntity<?> criar(@RequestBody UsuarioDTO usuarioDTO) {
+        try {
+            Usuario novoUsuario = new Usuario();
+            novoUsuario.setNome(usuarioDTO.getNome());
+            novoUsuario.setEmail(usuarioDTO.getEmail());
+            novoUsuario.setSenha(usuarioDTO.getSenha());
+            novoUsuario.setPerfil(Perfil.user);
+
+            Congregacao congregacao = congregacaoRepository.findById(usuarioDTO.getIdCongregacao())
+                    .orElseThrow(() -> new IllegalArgumentException("Congregação não encontrada"));
+
+            novoUsuario.setCongregacao(congregacao);
+
+            Usuario salvo = authService.adicionar(novoUsuario);
+            return ResponseEntity.ok(salvo);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-    	}
+        }
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizarUsuario(
-    		@PathVariable int id, 
+    		@PathVariable Long id, 
     		@RequestBody Usuario usuarioAtualizado) {
         return usuarioRepository.findById(id)
             .map(usuarioExistente -> {
                 usuarioExistente.setNome(usuarioAtualizado.getNome());
-                usuarioExistente.setUsuario(usuarioAtualizado.getUsuario());
+                usuarioExistente.setEmail(usuarioAtualizado.getEmail());
                 usuarioExistente.setSenha(usuarioAtualizado.getSenha());
                 // atualize outros campos, se houver
                 usuarioRepository.save(usuarioExistente);
@@ -68,7 +86,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletarUsuario(@PathVariable int id) {
+    public ResponseEntity<?> deletarUsuario(@PathVariable Long id) {
         return usuarioRepository.findById(id)
             .map(usuario -> {
                 usuarioRepository.delete(usuario);
@@ -78,15 +96,15 @@ public class UsuarioController {
     }
 }
 class LoginRequest {
-    private String usuario;
+    private String email;
     private String senha;
 
-    public String getUsuario() {
-        return usuario;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getSenha() {

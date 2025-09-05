@@ -4,10 +4,10 @@ import java.time.LocalDate;
 
 public class MovimentacaoDTO {
     private String descricao;
-    private double valor;
+    private Double valor;
     private LocalDate data;
-    private String tipo; // Pode ser TipoMovimentacao ou String dependendo da necessidade
-    private Integer id_usuario; // Adicione o id do usuário
+    private TipoMovimentacao tipo; 
+    private Long usuarioId;
 
     // Getters e Setters
     public String getDescricao() {
@@ -18,11 +18,11 @@ public class MovimentacaoDTO {
         this.descricao = descricao;
     }
 
-    public double getValor() {
+    public Double getValor() {
         return valor;
     }
 
-    public void setValor(double valor) {
+    public void setValor(Double valor) {
         this.valor = valor;
     }
 
@@ -34,19 +34,19 @@ public class MovimentacaoDTO {
         this.data = data;
     }
 
-    public String getTipo() {
+    public TipoMovimentacao getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoMovimentacao tipo) {
         this.tipo = tipo;
     }
 
-    public Integer getUsuarioId() {
-        return id_usuario;
+    public Long getUsuarioId() {
+        return usuarioId;
     }
 
-    public void setUsuarioId(Integer id_usuario) {
-        this.id_usuario = id_usuario;
+    public void setUsuarioId(Long usuarioId) {
+        this.usuarioId = usuarioId;
     }
 }

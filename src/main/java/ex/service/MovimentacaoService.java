@@ -1,8 +1,8 @@
 package ex.service;
 
 import ex.model.Movimentacao;
+import ex.model.TipoMovimentacao;
 import ex.model.repository.MovimentacaoRepository;
-import ex.model.repository.TipoMovimentacao;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class MovimentacaoService {
     // Adicionar uma nova movimentação
     @Transactional
     public Movimentacao adicionar(Movimentacao movimentacao) {
-        if (movimentacao.getTipo() == TipoMovimentacao.dizimo) {
+        if (movimentacao.getTipo() == TipoMovimentacao.DIZIMO) {
             if (movimentacao.getUsuario() == null) {
                 throw new IllegalArgumentException("Usuário não pode ser nulo para Dízimo.");
             }
@@ -48,9 +48,9 @@ public class MovimentacaoService {
     }
     
     public BigDecimal calcularTotalGeral() {
-    	BigDecimal Totaldizimos = movimentacaoRepository.getTotalPorTipo(TipoMovimentacao.dizimo);
-    	BigDecimal Totaloferta = movimentacaoRepository.getTotalPorTipo(TipoMovimentacao.oferta);
-    	BigDecimal Totaldespesa = movimentacaoRepository.getTotalPorTipo(TipoMovimentacao.despesa);
+    	BigDecimal Totaldizimos = movimentacaoRepository.getTotalPorTipo(TipoMovimentacao.DIZIMO);
+    	BigDecimal Totaloferta = movimentacaoRepository.getTotalPorTipo(TipoMovimentacao.OFERTA);
+    	BigDecimal Totaldespesa = movimentacaoRepository.getTotalPorTipo(TipoMovimentacao.DESPESA);
     	BigDecimal totalGeral = Totaldizimos.add(Totaloferta).subtract(Totaldespesa);
     	return totalGeral;
     	
@@ -69,7 +69,7 @@ public class MovimentacaoService {
         Movimentacao movimentacaoExistente = movimentacaoRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Movimentação não encontrada com ID: " + id));
 
-        if (movimentacaoAtualizada.getTipo() == TipoMovimentacao.dizimo) {
+        if (movimentacaoAtualizada.getTipo() == TipoMovimentacao.DIZIMO) {
             if (movimentacaoAtualizada.getUsuario() == null) {
                 throw new IllegalArgumentException("Usuário não pode ser nulo para Dízimo.");
             }
