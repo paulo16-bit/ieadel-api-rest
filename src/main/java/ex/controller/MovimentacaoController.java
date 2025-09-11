@@ -32,39 +32,46 @@ public class MovimentacaoController {
     // Rota para listar todas as movimentações (GET)
     @GetMapping
     public ResponseEntity<List<Movimentacao>> listarPorMesAno(
-    	@RequestParam TipoMovimentacao tipo,
-    	@RequestParam String mes,
-        @RequestParam String ano) {
-        
+            @RequestParam TipoMovimentacao tipo,
+            @RequestParam String mes,
+            @RequestParam String ano,
+            @RequestParam int idCongregacao) {
+
         // Validação dos parâmetros
         if (!mes.matches("\\d{2}") || !ano.matches("\\d{4}")) {
             return ResponseEntity.badRequest().body(Collections.emptyList());
         }
-        
-        List<Movimentacao> movimentacoes = movimentacaoService.listarPorMesAno(tipo, mes, ano);
+
+        List<Movimentacao> movimentacoes = movimentacaoService.listarPorMesAnoECongregacao(tipo, mes, ano, idCongregacao);
         return ResponseEntity.ok(movimentacoes);
     }
-    
+
+
     @GetMapping("/totais")
     public ResponseEntity<Map<String, BigDecimal>> getTotaisPorMes(
-        @RequestParam String mes,
-        @RequestParam String ano) {
-        
+            @RequestParam String mes,
+            @RequestParam String ano,
+            @RequestParam int idCongregacao) {
+
         Map<String, BigDecimal> totais = new HashMap<>();
-        totais.put("dizimo", movimentacaoService.calcularTotal(TipoMovimentacao.DIZIMO, mes, ano));
-        totais.put("oferta", movimentacaoService.calcularTotal(TipoMovimentacao.OFERTA, mes, ano));
-        totais.put("despesa", movimentacaoService.calcularTotal(TipoMovimentacao.DESPESA, mes, ano));
-        
+        totais.put("dizimo", movimentacaoService.calcularTotalECongregacao(TipoMovimentacao.DIZIMO, mes, ano, idCongregacao));
+        totais.put("oferta", movimentacaoService.calcularTotalECongregacao(TipoMovimentacao.OFERTA, mes, ano, idCongregacao));
+        totais.put("despesa", movimentacaoService.calcularTotalECongregacao(TipoMovimentacao.DESPESA, mes, ano, idCongregacao));
+
         return ResponseEntity.ok(totais);
     }
+
     @GetMapping("/totalGeral")
-    public ResponseEntity<Map<String, BigDecimal>> getTotalGerals(){
-    	Map<String, BigDecimal> totais = new HashMap<>();
-    	totais.put("total", movimentacaoService.calcularTotalGeral());
-    	return ResponseEntity.ok(totais);
+    public ResponseEntity<Map<String, BigDecimal>> getTotalGeral(
+            @RequestParam int idCongregacao) {
+
+        Map<String, BigDecimal> totais = new HashMap<>();
+        totais.put("total", movimentacaoService.calcularTotalGeralPorCongregacao(idCongregacao));
+        return ResponseEntity.ok(totais);
     }
-    
-    
+
+
+
     @GetMapping("/{id}")
     public ResponseEntity<Movimentacao> buscarMovimentacaoPorId(@PathVariable int id) {
         return movimentacaoRepository.findById(id)
