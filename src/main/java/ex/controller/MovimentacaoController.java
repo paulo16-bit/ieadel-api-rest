@@ -1,9 +1,11 @@
 package ex.controller;
 
+import ex.model.Congregacao;
 import ex.model.Movimentacao;
 import ex.model.MovimentacaoDTO;
 import ex.model.TipoMovimentacao;
 import ex.model.Usuario;
+import ex.model.repository.CongregacaoRepository;
 import ex.model.repository.MovimentacaoRepository;
 import ex.model.repository.UsuarioRepository;
 import ex.service.MovimentacaoService;
@@ -28,6 +30,8 @@ public class MovimentacaoController {
     private MovimentacaoRepository movimentacaoRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private CongregacaoRepository congregacaoRepository;
 
     // Rota para listar todas as movimentações (GET)
     @GetMapping
@@ -89,7 +93,7 @@ public class MovimentacaoController {
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody MovimentacaoDTO movimentacaoDTO) {
         try {
-            if (movimentacaoDTO.getTipo().equals("dizimo") && movimentacaoDTO.getUsuarioId() == null) {
+            if (movimentacaoDTO.getTipo().equals("DIZIMO") && movimentacaoDTO.getUsuarioId() == null) {
                 return ResponseEntity.badRequest().body("Dízimos requerem usuarioId");
             }
 
@@ -99,6 +103,10 @@ public class MovimentacaoController {
             movimentacao.setValor(movimentacaoDTO.getValor());
             movimentacao.setData(movimentacaoDTO.getData());
             movimentacao.setTipo(TipoMovimentacao.valueOf(movimentacaoDTO.getTipo().name()));
+            Congregacao congregacao = congregacaoRepository.findById(movimentacaoDTO.getIdCongregacao())
+                .orElseThrow(() -> new RuntimeException("Congregação não encontrada"));
+
+            movimentacao.setCongregacao(congregacao);
 
             // Busque o usuário se necessário
             if (movimentacaoDTO.getUsuarioId() != null) {
@@ -122,7 +130,7 @@ public class MovimentacaoController {
         
         try {
             // Validação para dízimos
-            if (movimentacaoDTO.getTipo().equals("dizimo") && movimentacaoDTO.getUsuarioId() == null) {
+            if (movimentacaoDTO.getTipo().equals("DIZIMO") && movimentacaoDTO.getUsuarioId() == null) {
                 return ResponseEntity.badRequest().body("Dízimos requerem usuarioId");
             }
 
@@ -134,9 +142,9 @@ public class MovimentacaoController {
             movimentacao.setTipo(TipoMovimentacao.valueOf(movimentacaoDTO.getTipo().name()));
 
             // Vincula usuário se for dízimo
-            if (movimentacaoDTO.getTipo().equals("dizimo")) {
+            if (movimentacaoDTO.getUsuarioId() != null) {
                 Usuario usuario = usuarioRepository.findById(movimentacaoDTO.getUsuarioId())
-                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
                 movimentacao.setUsuario(usuario);
             }
 

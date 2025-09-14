@@ -18,7 +18,7 @@ public class Movimentacao {
     private Congregacao congregacao;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
     @Column(nullable = false, length = 255)
