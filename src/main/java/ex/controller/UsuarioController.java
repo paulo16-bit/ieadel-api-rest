@@ -55,7 +55,7 @@ public class UsuarioController {
             novoUsuario.setNome(usuarioDTO.getNome());
             novoUsuario.setEmail(usuarioDTO.getEmail());
             novoUsuario.setSenha(usuarioDTO.getSenha());
-            novoUsuario.setPerfil(Perfil.user);
+            novoUsuario.setPerfil(Perfil.USER);
 
             Congregacao congregacao = congregacaoRepository.findById(usuarioDTO.getIdCongregacao())
                     .orElseThrow(() -> new IllegalArgumentException("Congregação não encontrada"));
