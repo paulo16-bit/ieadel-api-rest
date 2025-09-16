@@ -22,7 +22,7 @@ public class Usuario {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private Perfil perfil = Perfil.ADMIN;
+    private Perfil perfil = Perfil.USER;
 
     private Boolean ativo = true;
 
