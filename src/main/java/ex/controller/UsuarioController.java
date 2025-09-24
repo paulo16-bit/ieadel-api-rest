@@ -44,11 +44,12 @@ public class UsuarioController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
-        var usuario = this.authenticationManager.authenticate(usernamePassword);
+        var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        var token = tokenService.generateToken((Usuario) usuario.getPrincipal());
+        var usuario = (Usuario) auth.getPrincipal(); // Obtenha o objeto Usuario
+        var token = tokenService.generateToken(usuario); // Gere o token com o objeto Usuario
 
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+        return ResponseEntity.ok(new LoginResponseDTO(token, usuario)); // Retorne o DTO com token e usuário
     }
 
 
