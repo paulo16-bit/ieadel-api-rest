@@ -1,10 +1,6 @@
 package ex.controller;
 
-import ex.model.Congregacao;
-import ex.model.Movimentacao;
-import ex.model.MovimentacaoDTO;
-import ex.model.TipoMovimentacao;
-import ex.model.Usuario;
+import ex.model.*;
 import ex.model.repository.CongregacaoRepository;
 import ex.model.repository.MovimentacaoRepository;
 import ex.model.repository.UsuarioRepository;
@@ -104,7 +100,7 @@ public class MovimentacaoController {
             movimentacao.setData(movimentacaoDTO.getData());
             movimentacao.setTipo(TipoMovimentacao.valueOf(movimentacaoDTO.getTipo().name()));
             Congregacao congregacao = congregacaoRepository.findById(movimentacaoDTO.getIdCongregacao())
-                .orElseThrow(() -> new RuntimeException("Congregação não encontrada"));
+                    .orElseThrow(() -> new RuntimeException("Congregação não encontrado"));
 
             movimentacao.setCongregacao(congregacao);
 

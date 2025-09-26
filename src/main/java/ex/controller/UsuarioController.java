@@ -1,18 +1,22 @@
 package ex.controller;
 
-import ex.model.Congregacao;
-import ex.model.Perfil;
-import ex.model.Usuario;
-import ex.model.UsuarioDTO;
+import ex.infra.security.TokenService;
+import ex.model.*;
 import ex.model.repository.UsuarioRepository;
 import ex.model.repository.CongregacaoRepository;
 import ex.service.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -20,23 +24,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class UsuarioController {
 	@Autowired
-    private AuthService authService;
-	@Autowired
 	private UsuarioRepository usuarioRepository;
     @Autowired
     private CongregacaoRepository congregacaoRepository;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private TokenService tokenService;
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-    	Usuario user = authService.autenticar(request.getEmail(), request.getSenha());
-        
-    	if (user != null) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos");
-        }
-    }
-    
     @GetMapping
     public List<Usuario> listarUsuarios() {
         return usuarioRepository.findAll();
@@ -44,29 +39,45 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> buscarUsuarioPorId(@PathVariable Long id) {
         return usuarioRepository.findById(id)
-            .map(usuario -> ResponseEntity.ok(usuario))
-            .orElse(ResponseEntity.notFound().build());
+                .map(usuario -> ResponseEntity.ok(usuario))
+                .orElse(ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data, HttpServletResponse response) {
+        var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
+        var auth = this.authenticationManager.authenticate(usernamePassword);
+
+        var usuario = (Usuario) auth.getPrincipal(); // Obtenha o objeto Usuario
+        var token = tokenService.generateToken(usuario); // Gere o token com o objeto Usuario
+
+        ResponseCookie cookie = ResponseCookie.from("token", token)
+                .httpOnly(true)
+                .secure(false) // true em produção (HTTPS)
+                .path("/")
+                .maxAge(24 * 60 * 60) // 1 dia
+                .sameSite("None")
+                .build();
+
+        response.setHeader("Set-Cookie", cookie.toString());
+
+        return ResponseEntity.ok(new LoginResponseDTO(token, usuario)); // Retorne o DTO com token e usuário
+    }
+
+
     @PostMapping("/novo")
-    public ResponseEntity<?> criar(@RequestBody UsuarioDTO usuarioDTO) {
-        try {
-            Usuario novoUsuario = new Usuario();
-            novoUsuario.setNome(usuarioDTO.getNome());
-            novoUsuario.setEmail(usuarioDTO.getEmail());
-            novoUsuario.setSenha(usuarioDTO.getSenha());
-            novoUsuario.setPerfil(Perfil.USER);
+    public ResponseEntity criar(@RequestBody @Valid RegisterDTO data) {
+        if (this.usuarioRepository.findByEmail(data.email()) != null) return ResponseEntity.badRequest().build();
 
-            Congregacao congregacao = congregacaoRepository.findById(usuarioDTO.getIdCongregacao())
-                    .orElseThrow(() -> new IllegalArgumentException("Congregação não encontrada"));
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.senha());
+        Usuario usuario = new Usuario(data.nome(), data.email(), encryptedPassword, data.perfil());
+        usuario.setPerfil(Perfil.USER);
+        Congregacao congregacao = congregacaoRepository.findById(data.idCongregacao())
+                .orElseThrow(() -> new IllegalArgumentException("Congregação não encontrada"));;
+        usuario.setCongregacao(congregacao);
 
-            novoUsuario.setCongregacao(congregacao);
-
-            Usuario salvo = authService.adicionar(novoUsuario);
-            return ResponseEntity.ok(salvo);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        this.usuarioRepository.save(usuario);
+        return ResponseEntity.ok(usuario);
     }
 
     @PutMapping("/{id}")

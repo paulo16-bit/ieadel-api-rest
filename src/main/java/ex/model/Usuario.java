@@ -1,10 +1,16 @@
 package ex.model;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "usuario")
-public class Usuario {
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +35,18 @@ public class Usuario {
     @ManyToOne
     @JoinColumn(name = "id_congregacao", nullable = false)
     private Congregacao congregacao;
+
+    public Usuario(String nome, String email, String senha, Perfil perfil) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.perfil = perfil;
+
+    }
+
+    public Usuario() {
+
+    }
 
     // Getters e Setters
     public Long getId() {
@@ -85,6 +103,25 @@ public class Usuario {
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (this.perfil == Perfil.ADMIN) {
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+        } else  {
+            return List.of(new SimpleGrantedAuthority("USER"));
+        }
+    }
+
+    @Override
+    public String getPassword() {
+        return senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 }
 

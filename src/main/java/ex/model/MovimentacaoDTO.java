@@ -51,11 +51,5 @@ public class MovimentacaoDTO {
         this.usuarioId = usuarioId;
     }
 
-    public Long getIdCongregacao() {
-        return idCongregacao;
-    }
-
-    public void setIdCongregacao(Long idCongregacao) {
-        this.idCongregacao = idCongregacao;
-    }
+    public Long getIdCongregacao() { return idCongregacao; }
 }

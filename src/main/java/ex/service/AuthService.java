@@ -19,13 +19,13 @@ public class AuthService {
     	return usuarioRepository.save(usuario);
     }
 
-    public Usuario autenticar(String email, String senha) {
-        Usuario user = usuarioRepository.findByEmail(email);
-        if (user != null && user.getSenha().equals(MD5(senha))) {
-            return user; 
-        }
-        return null;
-    }
+//    public Usuario autenticar(String email, String senha) {
+//        Usuario user = usuarioRepository.findByEmail(email);
+//        if (user != null && user.getSenha().equals(MD5(senha))) {
+//            return user;
+//        }
+//        return null;
+//    }
 
     private String MD5(String input) {
         try {
