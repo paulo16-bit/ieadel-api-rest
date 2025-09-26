@@ -8,6 +8,7 @@ public class MovimentacaoDTO {
     private LocalDate data;
     private TipoMovimentacao tipo; 
     private Long usuarioId;
+    private Long idCongregacao;
 
     // Getters e Setters
     public String getDescricao() {
@@ -49,4 +50,6 @@ public class MovimentacaoDTO {
     public void setUsuarioId(Long usuarioId) {
         this.usuarioId = usuarioId;
     }
+
+    public Long getIdCongregacao() { return idCongregacao; }
 }
