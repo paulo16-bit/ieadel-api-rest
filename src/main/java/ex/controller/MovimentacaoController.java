@@ -89,7 +89,7 @@ public class MovimentacaoController {
     @PostMapping
     public ResponseEntity<?> criar(@RequestBody MovimentacaoDTO movimentacaoDTO) {
         try {
-            if (movimentacaoDTO.getTipo().equals("dizimo") && movimentacaoDTO.getUsuarioId() == null) {
+            if (movimentacaoDTO.getTipo().equals("DIZIMO") && movimentacaoDTO.getUsuarioId() == null) {
                 return ResponseEntity.badRequest().body("Dízimos requerem usuarioId");
             }
 
@@ -101,6 +101,7 @@ public class MovimentacaoController {
             movimentacao.setTipo(TipoMovimentacao.valueOf(movimentacaoDTO.getTipo().name()));
             Congregacao congregacao = congregacaoRepository.findById(movimentacaoDTO.getIdCongregacao())
                     .orElseThrow(() -> new RuntimeException("Congregação não encontrado"));
+
             movimentacao.setCongregacao(congregacao);
 
             // Busque o usuário se necessário
@@ -125,7 +126,7 @@ public class MovimentacaoController {
         
         try {
             // Validação para dízimos
-            if (movimentacaoDTO.getTipo().equals("dizimo") && movimentacaoDTO.getUsuarioId() == null) {
+            if (movimentacaoDTO.getTipo().equals("DIZIMO") && movimentacaoDTO.getUsuarioId() == null) {
                 return ResponseEntity.badRequest().body("Dízimos requerem usuarioId");
             }
 
@@ -137,9 +138,9 @@ public class MovimentacaoController {
             movimentacao.setTipo(TipoMovimentacao.valueOf(movimentacaoDTO.getTipo().name()));
 
             // Vincula usuário se for dízimo
-            if (movimentacaoDTO.getTipo().equals("dizimo")) {
+            if (movimentacaoDTO.getUsuarioId() != null) {
                 Usuario usuario = usuarioRepository.findById(movimentacaoDTO.getUsuarioId())
-                        .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
                 movimentacao.setUsuario(usuario);
             }
 
