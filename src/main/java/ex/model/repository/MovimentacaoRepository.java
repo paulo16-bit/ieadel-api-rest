@@ -16,7 +16,8 @@ public interface MovimentacaoRepository extends JpaRepository<Movimentacao, Inte
     List<Movimentacao> findByTipo(TipoMovimentacao tipo);
 
     // Listar por usuário
-    List<Movimentacao> findByUsuarioId(int id);
+    @Query("SELECT m FROM Movimentacao m WHERE m.usuario.id = :id"+" ORDER BY m.data ASC")
+    List<Movimentacao> findByUsuarioId(@Param("id") int id);
 
     // Listar todas
     List<Movimentacao> findAll();
